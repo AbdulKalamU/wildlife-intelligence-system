@@ -117,7 +117,7 @@ st.markdown("""
     
     /* Species card */
     .species-item {
-        background-color: #f8f9fa;
+        background: linear-gradient(135deg, rgba(40, 167, 69, 0.15) 0%, rgba(40, 167, 69, 0.05) 100%);
         padding: 0.75rem 1rem;
         border-radius: 8px;
         margin-bottom: 0.5rem;
@@ -129,25 +129,25 @@ st.markdown("""
     }
     
     .species-item:hover {
-        background-color: #e9ecef;
+        background: linear-gradient(135deg, rgba(40, 167, 69, 0.25) 0%, rgba(40, 167, 69, 0.15) 100%);
         transform: translateX(4px);
     }
     
     .species-name {
         font-weight: 600;
-        color: #1f1f1f;
+        color: #e0e0e0;
         font-size: 0.95rem;
     }
     
     .species-count {
         font-size: 1.5rem;
         font-weight: 700;
-        color: #28a745;
+        color: #4caf50;
     }
     
     /* Zone card */
     .zone-item {
-        background-color: #f8f9fa;
+        background: linear-gradient(135deg, rgba(0, 123, 255, 0.15) 0%, rgba(0, 123, 255, 0.05) 100%);
         padding: 0.75rem 1rem;
         border-radius: 8px;
         margin-bottom: 0.5rem;
@@ -159,20 +159,20 @@ st.markdown("""
     }
     
     .zone-item:hover {
-        background-color: #e9ecef;
+        background: linear-gradient(135deg, rgba(0, 123, 255, 0.25) 0%, rgba(0, 123, 255, 0.15) 100%);
         transform: translateX(4px);
     }
     
     .zone-name {
         font-weight: 600;
-        color: #1f1f1f;
+        color: #e0e0e0;
         font-size: 0.95rem;
     }
     
     .zone-count {
         font-size: 1.5rem;
         font-weight: 700;
-        color: #007bff;
+        color: #42a5f5;
     }
     
     /* Alert cards */
@@ -186,19 +186,23 @@ st.markdown("""
     }
     
     .alert-high {
-        background-color: #fee;
-        border-left: 4px solid #dc3545;
+        background: linear-gradient(135deg, #ff8a80 0%, #ff5252 100%);
+        color: white;
+        border-left: 4px solid #d32f2f;
         padding: 0.75rem 1rem;
         margin-bottom: 0.5rem;
         border-radius: 6px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     
     .alert-medium {
-        background-color: #fff3cd;
-        border-left: 4px solid #ffc107;
+        background: linear-gradient(135deg, #ffd54f 0%, #ffb300 100%);
+        color: #1a1a1a;
+        border-left: 4px solid #f57c00;
         padding: 0.75rem 1rem;
         margin-bottom: 0.5rem;
         border-radius: 6px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     
     .alert-title {
@@ -215,28 +219,29 @@ st.markdown("""
     /* Event log */
     .event-item {
         padding: 0.6rem 0.75rem;
-        border-bottom: 1px solid #e9ecef;
+        border-bottom: 1px solid #2a2a2a;
         font-size: 0.9rem;
         transition: background-color 0.2s;
+        background-color: transparent;
     }
     
     .event-item:hover {
-        background-color: #f8f9fa;
+        background-color: rgba(255, 255, 255, 0.05);
     }
     
     .event-time {
-        color: #666;
+        color: #999;
         font-size: 0.85rem;
         font-weight: 600;
     }
     
     .event-species {
         font-weight: 600;
-        color: #1f1f1f;
+        color: #e0e0e0;
     }
     
     .event-zone {
-        color: #007bff;
+        color: #64b5f6;
         font-weight: 600;
     }
     
