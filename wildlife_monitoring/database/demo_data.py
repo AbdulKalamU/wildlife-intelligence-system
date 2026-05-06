@@ -5,6 +5,7 @@ Generates realistic sample data for demonstration purposes.
 
 from datetime import datetime, timedelta
 import random
+import json
 from typing import List, Dict
 import sqlite3
 
@@ -92,42 +93,51 @@ class DemoDataGenerator:
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         
-        # Create table if not exists
+        # Create table if not exists (matching actual schema)
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS sightings (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                timestamp TEXT NOT NULL,
                 species TEXT NOT NULL,
                 confidence REAL NOT NULL,
-                zone TEXT,
-                track_id INTEGER,
-                frame_number INTEGER,
-                bbox_x1 INTEGER,
-                bbox_y1 INTEGER,
-                bbox_x2 INTEGER,
-                bbox_y2 INTEGER
+                timestamp TEXT NOT NULL,
+                track_id INTEGER NOT NULL,
+                frame_number INTEGER DEFAULT 0,
+                bbox TEXT,
+                location TEXT,
+                UNIQUE(track_id, frame_number)
             )
         """)
         
-        # Insert demo data
+        # Insert demo data (store zone in location field)
         for sighting in sightings:
-            cursor.execute("""
-                INSERT INTO sightings 
-                (timestamp, species, confidence, zone, track_id, frame_number, 
-                 bbox_x1, bbox_y1, bbox_x2, bbox_y2)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                sighting['timestamp'],
-                sighting['species'],
-                sighting['confidence'],
-                sighting['zone'],
-                sighting['track_id'],
-                sighting['frame_number'],
-                sighting['bbox_x1'],
-                sighting['bbox_y1'],
-                sighting['bbox_x2'],
-                sighting['bbox_y2']
-            ))
+            try:
+                # Store zone in location field as "Zone X"
+                location = f"Zone {sighting['zone']}"
+                
+                # Create bbox JSON string
+                bbox_json = json.dumps([
+                    sighting['bbox_x1'],
+                    sighting['bbox_y1'],
+                    sighting['bbox_x2'],
+                    sighting['bbox_y2']
+                ])
+                
+                cursor.execute("""
+                    INSERT INTO sightings 
+                    (timestamp, species, confidence, track_id, frame_number, bbox, location)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    sighting['timestamp'],
+                    sighting['species'],
+                    sighting['confidence'],
+                    sighting['track_id'],
+                    sighting['frame_number'],
+                    bbox_json,
+                    location
+                ))
+            except sqlite3.IntegrityError:
+                # Skip duplicates
+                continue
         
         conn.commit()
         conn.close()

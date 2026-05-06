@@ -781,12 +781,22 @@ def get_dashboard_data():
         if a.severity in ['high', 'medium'] and a.alert != 'stable'
     ]
     
-    # Calculate zone distribution from recent events
+    # Calculate zone distribution from database (location field contains "Zone X")
     zone_counts = {'A': 0, 'B': 0, 'C': 0, 'D': 0}
-    for event in list(st.session_state.event_log)[:50]:  # Last 50 events
-        zone = event.get('zone', 'A')
-        if zone in zone_counts:
-            zone_counts[zone] += 1
+    try:
+        recent_sightings = st.session_state.db.get_recent_sightings(limit=100)
+        for sighting in recent_sightings:
+            location = sighting.get('location', '')
+            if location and location.startswith('Zone '):
+                zone = location.split(' ')[1]
+                if zone in zone_counts:
+                    zone_counts[zone] += 1
+    except:
+        # Fallback to event log if database query fails
+        for event in list(st.session_state.event_log)[:50]:
+            zone = event.get('zone', 'A')
+            if zone in zone_counts:
+                zone_counts[zone] += 1
     
     # Calculate summary
     total_animals = sum(s['count'] for s in valid_species)
@@ -1014,6 +1024,56 @@ def render_confidence_distribution():
 
 def render_sightings_table():
     """Render recent sightings database table."""
+    # Try to get from database first
+    try:
+        db_sightings = st.session_state.db.get_recent_sightings(limit=50)
+        if db_sightings and len(db_sightings) > 0:
+            # Convert to DataFrame
+            df_data = []
+            for s in db_sightings:
+                # Extract zone from location field
+                location = s.get('location', '')
+                zone = location.split(' ')[1] if location and location.startswith('Zone ') else '-'
+                
+                df_data.append({
+                    'Time': datetime.fromisoformat(s['timestamp']).strftime('%H:%M:%S'),
+                    'Species': s['species'],
+                    'Confidence': f"{s['confidence']:.1%}",
+                    'Zone': zone,
+                    'Track ID': s['track_id']
+                })
+            
+            df = pd.DataFrame(df_data)
+            
+            # Display table
+            st.dataframe(df, use_container_width=True, height=300)
+            
+            # Export buttons
+            col1, col2 = st.columns(2)
+            with col1:
+                csv = df.to_csv(index=False)
+                st.download_button(
+                    label="Export CSV",
+                    data=csv,
+                    file_name=f"sightings_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+                    mime="text/csv",
+                    use_container_width=True
+                )
+            with col2:
+                json_data = df.to_json(orient='records', indent=2)
+                st.download_button(
+                    label="Export JSON",
+                    data=json_data,
+                    file_name=f"sightings_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
+                    mime="application/json",
+                    use_container_width=True
+                )
+            return
+    except Exception as e:
+        # Fall back to session state sightings_log
+        pass
+    
+    # Fallback: use session state sightings_log
     if st.session_state.sightings_log and len(st.session_state.sightings_log) > 0:
         # Get last 50 sightings
         recent_sightings = st.session_state.sightings_log[-50:]
