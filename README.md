@@ -2,6 +2,8 @@
 
 Real-time wildlife monitoring system with AI-powered detection, tracking, and analytics.
 
+**Status**: ✅ Deployed on Railway with Docker support
+
 ## Features
 
 - **Real-time Detection**: YOLOv8-based animal detection
