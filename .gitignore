@@ -1,0 +1,74 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Kiro
+.kiro/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+
+# Model files (download on first run)
+*.pt
+*.pth
+*.onnx
+models/
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Documentation (keep only essential)
+aidlc-docs/
+
+# Test coverage
+.coverage
+htmlcov/
+.pytest_cache/

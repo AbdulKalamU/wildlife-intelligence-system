@@ -1,0 +1,152 @@
+# Wildlife Monitoring System - Model Configuration
+
+# YOLOv8 Detection Model
+detection:
+  model_name: "yolov8n"
+  model_path: "yolov8n.pt"
+  confidence_threshold: 0.5
+  iou_threshold: 0.45
+  input_size: [640, 640]
+  device: "cuda"  # cuda, cpu, or mps (for Apple Silicon)
+  
+  # Classes to detect (empty = all classes)
+  target_classes: []
+  
+  # Performance settings
+  half_precision: false  # Use FP16 for faster inference
+  batch_size: 1
+
+# Species Classification Model
+classification:
+  model_name: "resnet50"  # Options: resnet50, resnet101, efficientnet_b0
+  confidence_threshold: 0.3
+  device: "auto"  # auto, cuda, cpu, or mps (for Apple Silicon)
+  
+  # ImageNet-based classification
+  # Uses pretrained models with wildlife classes from ImageNet
+  use_imagenet: true
+  
+  # Wildlife species mapping
+  # Maps ImageNet classes to wildlife categories
+  wildlife_classes:
+    mammals:
+      - "Deer (White-tailed)"
+      - "Deer (Mule)"
+      - "Elk"
+      - "Moose"
+      - "Arctic Fox"
+      - "Grey Fox"
+      - "Red Fox"
+      - "Brown Bear"
+      - "American Black Bear"
+      - "Polar Bear"
+      - "Timber Wolf"
+      - "Coyote"
+      - "Rabbit"
+      - "Hare"
+      - "Fox Squirrel"
+      - "Beaver"
+    birds:
+      - "Bald Eagle"
+      - "Vulture"
+      - "Great Grey Owl"
+      - "Robin"
+      - "Jay"
+      - "Magpie"
+    reptiles:
+      - "Bullfrog"
+      - "Tree Frog"
+  
+  # Endangered species (for alerts)
+  endangered:
+    - "Timber Wolf"
+    - "Brown Bear"
+    - "Polar Bear"
+    - "Bald Eagle"
+
+# Tracking Configuration
+tracking:
+  algorithm: "centroid"
+  max_disappeared: 50
+  max_distance: 100  # Maximum distance for matching
+  
+  # Track filtering
+  min_track_length: 5  # Minimum frames to consider valid track
+  min_confidence: 0.5  # Minimum detection confidence for tracking
+
+# Analytics Configuration
+analytics:
+  trend_analysis:
+    enabled: true
+    time_window_hours: 24
+    update_interval_seconds: 60
+  
+  risk_assessment:
+    enabled: true
+    rules:
+      - name: "endangered_species"
+        enabled: true
+        priority: "high"
+      - name: "high_density"
+        enabled: true
+        priority: "medium"
+        threshold: 10
+      - name: "rapid_decline"
+        enabled: true
+        priority: "high"
+        threshold: -0.5
+  
+  statistics:
+    enabled: true
+    calculate_percentiles: true
+    detect_outliers: true
+
+# Alert Configuration
+alerts:
+  enabled: true
+  priority_levels:
+    - "low"
+    - "medium"
+    - "high"
+    - "critical"
+  
+  # Alert delivery methods
+  delivery:
+    dashboard: true
+    email: false
+    sms: false
+    webhook: false
+  
+  # Alert rules
+  rules:
+    endangered_species_detected:
+      enabled: true
+      priority: "high"
+    
+    high_population_density:
+      enabled: true
+      priority: "medium"
+      threshold: 10
+    
+    unusual_activity_pattern:
+      enabled: true
+      priority: "low"
+
+# Dashboard Configuration
+dashboard:
+  title: "Wildlife Monitoring System"
+  refresh_rate: 1.0  # seconds
+  max_alerts_display: 10
+  max_tracks_display: 20
+  
+  # Visualization settings
+  visualizations:
+    show_bounding_boxes: true
+    show_track_paths: true
+    show_confidence_scores: true
+    show_species_labels: true
+    
+    # Colors (BGR format)
+    bbox_color: [0, 255, 0]
+    track_color: [255, 0, 0]
+    text_color: [255, 255, 255]
