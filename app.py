@@ -1001,6 +1001,34 @@ def render_detection_timeline():
 
 def render_confidence_distribution():
     """Render confidence distribution histogram."""
+    # Try to get from database first
+    try:
+        db_sightings = st.session_state.db.get_recent_sightings(limit=100)
+        if db_sightings and len(db_sightings) > 0:
+            confidences = [s['confidence'] for s in db_sightings]
+            df = pd.DataFrame({'confidence': confidences})
+            
+            fig = px.histogram(
+                df,
+                x='confidence',
+                nbins=20,
+                title="Confidence Distribution",
+                labels={'confidence': 'Confidence', 'count': 'Frequency'}
+            )
+            fig.update_layout(
+                template='plotly_dark',
+                height=300,
+                margin=dict(l=20, r=20, t=40, b=20),
+                showlegend=False
+            )
+            fig.update_traces(marker_color='#ff6b6b')
+            st.plotly_chart(fig, use_container_width=True)
+            return
+    except Exception as e:
+        # Fall back to session state
+        pass
+    
+    # Fallback: use session state sightings_log
     if st.session_state.sightings_log and len(st.session_state.sightings_log) > 0:
         df = pd.DataFrame(st.session_state.sightings_log)
         fig = px.histogram(
