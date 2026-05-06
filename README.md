@@ -2,7 +2,7 @@
 
 Real-time wildlife monitoring system with AI-powered detection, tracking, and analytics.
 
-**Status**: ✅ Deployed on Railway with Docker support
+**Status**: ✅ Deployed on Railway with Docker support (v2.0)
 
 ## Features
 
