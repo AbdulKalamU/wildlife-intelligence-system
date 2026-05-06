@@ -1,0 +1,47 @@
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist
+build
+venv
+.venv
+env
+.env
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Documentation
+*.md
+!README.md
+
+# Databases (will be created at runtime)
+*.db
+
+# Temporary files
+*.log
+.DS_Store
+
+# Test files
+tests/
+examples/
+
+# AIDLC documentation
+aidlc-docs/
+
+# Archive
+archive/
