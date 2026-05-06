@@ -26,5 +26,5 @@ COPY . .
 # Expose port (Railway will override with $PORT)
 EXPOSE 8501
 
-# Run the application
-CMD streamlit run app.py --server.port=$PORT --server.address=0.0.0.0
+# Run the application with shell to expand $PORT variable
+CMD ["sh", "-c", "streamlit run app.py --server.port=${PORT:-8501} --server.address=0.0.0.0"]
