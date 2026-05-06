@@ -1,0 +1,28 @@
+# Local Development Requirements
+# Use this for local development with webcam support
+
+# Core Dependencies
+numpy>=1.24.0,<2.0.0
+pandas>=2.0.0
+scipy>=1.10.0
+
+# Computer Vision (full version with GUI support for local development)
+opencv-python>=4.8.0
+ultralytics>=8.0.0
+Pillow>=10.0.0
+
+# Deep Learning
+torch>=2.0.0
+torchvision>=0.15.0
+
+# Dashboard
+streamlit>=1.28.0
+plotly>=5.17.0
+
+# Utilities
+python-dotenv>=1.0.0
+pyyaml>=6.0
+
+# Additional dependencies for full functionality
+matplotlib>=3.7.0
+scikit-learn>=1.3.0
