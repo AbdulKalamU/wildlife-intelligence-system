@@ -18,6 +18,7 @@ import sys
 from pathlib import Path
 import tempfile
 import time
+import random
 from collections import deque, defaultdict
 import pandas as pd
 import plotly.express as px
@@ -33,6 +34,7 @@ from wildlife_monitoring.pipeline.modular_pipeline import (
 )
 from wildlife_monitoring.database import WildlifeDatabase
 from wildlife_monitoring.database.pipeline_integration import save_pipeline_results_to_db
+from wildlife_monitoring.database.demo_data import DemoDataGenerator
 from wildlife_monitoring.analytics import SightingsAnalytics
 from wildlife_monitoring.alerts import AnalyticsAlertSystem, AlertConfig
 
@@ -292,6 +294,8 @@ def initialize_session_state():
         st.session_state.alert_history = {}  # Changed from set to dict for timestamp tracking
     if 'detection_timeline' not in st.session_state:
         st.session_state.detection_timeline = deque(maxlen=100)  # (timestamp, count)
+    if 'demo_data_loaded' not in st.session_state:
+        st.session_state.demo_data_loaded = False
 
 
 @st.cache_resource
@@ -348,6 +352,34 @@ def initialize_system(db_path="wildlife_monitoring.db"):
     except Exception as e:
         st.error(f"Failed to initialize system: {e}")
         return False
+
+
+def load_demo_data():
+    """Load demo data into the database for demonstration."""
+    try:
+        generator = DemoDataGenerator("wildlife_monitoring.db")
+        count = generator.load_demo_data_to_db(count=150)
+        
+        # Generate demo events
+        demo_events = generator.generate_demo_events(count=50)
+        
+        # Add events to session state
+        for event in demo_events:
+            st.session_state.event_log.appendleft(event)
+        
+        # Generate demo timeline
+        base_time = datetime.now() - timedelta(hours=1)
+        for i in range(50):
+            timestamp = base_time + timedelta(minutes=i * 1.2)
+            count_val = random.randint(2, 8)
+            st.session_state.detection_timeline.append((timestamp, count_val))
+        
+        st.session_state.demo_data_loaded = True
+        
+        return count
+    except Exception as e:
+        st.error(f"Failed to load demo data: {e}")
+        return 0
 
 
 def get_zone_from_bbox(bbox, frame_width, frame_height):
@@ -1153,6 +1185,11 @@ def main():
     # Header
     st.title("Wildlife Intelligence Command Center")
     st.markdown("Real-time Detection • Zone Monitoring • Advanced Analytics")
+    
+    # Show demo data suggestion on first load
+    if not st.session_state.demo_data_loaded:
+        st.info("👋 **Welcome!** Click '📊 Load Demo Data' to see the dashboard with sample wildlife sightings, or upload your own video to start monitoring.")
+    
     st.markdown("")
     
     # Initialize system if not already done
@@ -1162,7 +1199,7 @@ def main():
                 st.stop()
     
     # Control panel (compact)
-    col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 2])
+    col1, col2, col3, col4, col5, col6 = st.columns([1, 1, 1, 1, 1.5, 1.5])
     
     with col1:
         source_type = st.selectbox("Source", ["Webcam", "Upload"], label_visibility="collapsed")
@@ -1192,6 +1229,14 @@ def main():
             st.rerun()
     
     with col5:
+        if st.button("📊 Load Demo Data", use_container_width=True, type="primary"):
+            with st.spinner("Loading demo data..."):
+                count = load_demo_data()
+                if count > 0:
+                    st.success(f"✅ Loaded {count} demo sightings!")
+                    st.rerun()
+    
+    with col6:
         if st.button("🔄 Clear All Data", use_container_width=True):
             st.session_state.db.clear_all_sightings()
             st.session_state.frame_number = 0
@@ -1200,7 +1245,9 @@ def main():
             st.session_state.track_history.clear()
             st.session_state.alert_history.clear()
             st.session_state.detection_timeline.clear()
+            st.session_state.demo_data_loaded = False
             st.success("All data cleared!")
+            st.rerun()
     
     st.markdown("")
     
