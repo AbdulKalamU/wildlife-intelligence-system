@@ -157,12 +157,16 @@ class DemoDataGenerator:
         events = []
         base_time = datetime.now() - timedelta(hours=1)
         
-        event_types = [
-            ('new_track', '{species} entered Zone {zone}'),
-            ('zone_change', '{species} moved from Zone {from_zone} to Zone {to_zone}'),
-            ('alert', '🚨 {species} entered Restricted Zone D'),
-            ('alert', '⭐ Rare species detected: {species}'),
+        # Define event types with proper templates
+        event_templates = [
+            ('new_track', '{species} entered Zone {zone}', 0.4),
+            ('zone_change', '{species} moved from Zone {from_zone} to Zone {zone}', 0.3),
+            ('alert', '🚨 {species} entered Restricted Zone D', 0.15),
+            ('alert', '⭐ Rare species detected: {species}', 0.15),
         ]
+        
+        # Rare species for special alerts
+        rare_species = ["African Elephant", "Grizzly Bear", "Masai Giraffe"]
         
         for i in range(count):
             timestamp = base_time + timedelta(minutes=i * 1.2)
@@ -170,16 +174,34 @@ class DemoDataGenerator:
             zone = random.choice(self.ZONES)
             track_id = random.randint(1, 30)
             
-            event_type, message_template = random.choice(event_types)
+            # Weighted random choice of event type
+            event_type, message_template, _ = random.choices(
+                event_templates,
+                weights=[t[2] for t in event_templates]
+            )[0]
             
+            # Generate message based on template
             if 'from_zone' in message_template:
                 from_zone = random.choice(self.ZONES)
                 to_zone = random.choice([z for z in self.ZONES if z != from_zone])
                 message = message_template.format(
                     species=species,
                     from_zone=from_zone,
-                    to_zone=to_zone
+                    zone=to_zone
                 )
+                zone = to_zone
+            elif 'Restricted Zone D' in message_template:
+                # Only create this alert if actually in Zone D
+                if zone == 'D':
+                    message = message_template.format(species=species, zone=zone)
+                else:
+                    continue  # Skip this event
+            elif 'Rare species' in message_template:
+                # Only create this alert for rare species
+                if species in rare_species:
+                    message = message_template.format(species=species, zone=zone)
+                else:
+                    continue  # Skip this event
             else:
                 message = message_template.format(species=species, zone=zone)
             

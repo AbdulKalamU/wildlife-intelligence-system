@@ -884,8 +884,16 @@ def render_alerts(alerts):
     # Get recent alert events from event log
     alert_events = [e for e in list(st.session_state.event_log)[:20] if e.get('type') == 'alert']
     
-    if alert_events:
-        for event in alert_events[:5]:  # Show top 5
+    # Filter out empty or invalid alerts
+    valid_alerts = []
+    for event in alert_events:
+        message = event.get('message', '').strip()
+        # Skip if message is empty or just an emoji
+        if message and len(message) > 2 and not message.isspace():
+            valid_alerts.append(event)
+    
+    if valid_alerts:
+        for event in valid_alerts[:5]:  # Show top 5
             # Determine severity from message
             message = event.get('message', '')
             if '🚨' in message or 'Restricted' in message or 'Human' in message:
@@ -1339,23 +1347,30 @@ def main():
     
     st.markdown("")
     
-    # Main layout: Video (left) | Dashboard (right)
-    col_video, col_dashboard = st.columns([2, 1])
-    
-    with col_video:
+    # Dynamic layout based on processing state
+    if st.session_state.processing:
+        # When processing: Video (left 2/3) | Dashboard (right 1/3)
+        col_video, col_dashboard = st.columns([2, 1])
+        
+        with col_video:
+            st.markdown("### Live Feed")
+            video_placeholder = st.empty()
+        
+        with col_dashboard:
+            st.markdown("### Intelligence Dashboard")
+            dashboard_placeholder = st.empty()
+    else:
+        # When not processing: Show dashboard in full width with compact video placeholder
         st.markdown("### Live Feed")
         video_placeholder = st.empty()
+        video_placeholder.info("Click 'Start' to begin monitoring")
         
-        if not st.session_state.processing:
-            video_placeholder.info("Click 'Start' to begin monitoring")
-    
-    with col_dashboard:
+        st.markdown("---")
         st.markdown("### Intelligence Dashboard")
-        dashboard_placeholder = st.empty()
+        dashboard_placeholder = st.container()
         
-        # Show initial dashboard
-        if not st.session_state.processing:
-            update_dashboard(dashboard_placeholder)
+        # Show initial dashboard in full width
+        update_dashboard(dashboard_placeholder)
     
     # Process video if started
     if st.session_state.processing and st.session_state.video_source:
